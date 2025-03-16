@@ -31,7 +31,25 @@ void AlbumDao::addAlbum(Album& album) const
     query.bindValue(":name",album.name());//связываем значения QVariant
     query.exec();//связанные значения будут правильно заменены.
     album.setId(query.lastInsertId().toInt());
+
     //query.lastInsertId(), которая возвращает значение QVariant, содержащее идентификатор только что вставленной строки альбома.
+}
+
+void AlbumDao::updateAlbum(const Album &album) const
+{
+    QSqlQuery query(mDatabase);
+    query.prepare("UPDATE albums SET name = (:name) WHERE id = (:id)");
+    query.bindValue(":name", album.name());
+    query.bindValue(":id", album.id());
+    query.exec();
+}
+
+void AlbumDao::removeAlbum(int id) const
+{
+    QSqlQuery query(mDatabase);
+    query.prepare("DELETE FROM albums WHERE id = (:id)");
+    query.bindValue(":id", id);
+    query.exec();
 }
 
 std::unique_ptr<std::vector<std::unique_ptr<Album> > > AlbumDao::albums() const
