@@ -14,17 +14,20 @@ TEMPLATE = app
 
 SOURCES += \
     albumlistwidget.cpp \
+    albumwidget.cpp \
     main.cpp \
     mainwindow.cpp \
     thumbnailproxymodel.cpp
 
 HEADERS += \
     albumlistwidget.h \
+    albumwidget.h \
     mainwindow.h \
     thumbnailproxymodel.h
 
 FORMS += \
     albumlistwidget.ui \
+    albumwidget.ui \
     mainwindow.ui
 
 # Default rules for deployment.

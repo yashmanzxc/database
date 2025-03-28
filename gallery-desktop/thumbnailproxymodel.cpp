@@ -8,6 +8,21 @@ ThumbnailProxyModel::ThumbnailProxyModel(QObject* parent): QIdentityProxyModel(p
 {  
 }
 
+QVariant ThumbnailProxyModel::data(const QModelIndex &index, int role) const
+{
+   //Для любой роли, которая не является Qt::DecorationRole, вызывается родительский класс data().
+   //В нашем случае это вызывает функцию data() из исходной модели, PictureModel.	После этого, когда функция data()
+   //должна возвращать миниатюру, путь к файлу изображения, на которое ссылается индекс, извлекается и
+   //используется для возврата объекта QPixmap mThumbnails.
+
+    if(role != Qt::DecorationPropertyRole){
+        return QIdentityProxyModel::data(index,role);
+    }
+
+    QString filepath = sourceModel()->data(index,PictureModel::PictureRole::FilePathRole).toString();
+    return *mThumbnails[filepath];
+}
+
 void ThumbnailProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
 {
     QIdentityProxyModel::setSourceModel(sourceModel);
@@ -20,6 +35,16 @@ void ThumbnailProxyModel::setSourceModel(QAbstractItemModel *sourceModel)
     connect(sourceModel, &QAbstractItemModel::rowsInserted,[this](const QModelIndex* parent, int first, int last){
         generatrThumbnails(index(first,0),last - first +1 );
     });
+}
+
+PictureModel *ThumbnailProxyModel::pictureModel() const
+{
+    //Классы, которые будут взаимодействовать с ThumbnailProxyModel, должны будут вызывать некоторые функции, которые
+    //специфичные для PictureModel, чтобы создавать или удалять изображения.
+    //Эта функция является помощником для централизованного приведения исходной модели к PictureModel*.
+
+
+    return static_cast<PictureModel*>(sourceModel());
 }
 
 void ThumbnailProxyModel::generatrThumbnails(const QModelIndex &startIndex, int count)
